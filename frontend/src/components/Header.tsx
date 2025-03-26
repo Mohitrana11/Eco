@@ -22,7 +22,12 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { LuShoppingCart } from "react-icons/lu";
+import { Link } from "react-router-dom";
 const navigation = {
+  pages: [
+    { name: "Home", href: "/" },
+    { name: "Stores", href: "#" },
+  ],
   categories: [
     {
       id: "women",
@@ -146,10 +151,6 @@ const navigation = {
       ],
     },
   ],
-  pages: [
-    { name: "Company", href: "#" },
-    { name: "Stores", href: "#" },
-  ],
 };
 
 export default function Header() {
@@ -259,12 +260,12 @@ export default function Header() {
             <div className="space-y-6 border-t border-gray-200 px-4 py-6">
               {navigation.pages.map((page) => (
                 <div key={page.name} className="flow-root">
-                  <a
-                    href={page.href}
+                  <Link
+                    to={page.href}
                     className="-m-2 block p-2 font-medium text-gray-900"
                   >
                     {page.name}
-                  </a>
+                  </Link>
                 </div>
               ))}
             </div>
@@ -409,13 +410,13 @@ export default function Header() {
                   ))}
 
                   {navigation.pages.map((page) => (
-                    <a
+                    <Link
                       key={page.name}
                       href={page.href}
                       className="flex items-center text-sm font-medium text-gray-700 hover:text-gray-800"
                     >
                       {page.name}
-                    </a>
+                    </Link>
                   ))}
                 </div>
               </PopoverGroup>
@@ -424,8 +425,8 @@ export default function Header() {
                   <div className="ml-auto flex items-center">
                     {/* Search */}
                     <div className="flex lg:ml-6">
-                      <a
-                        href="#"
+                      <Link
+                        to={"/search"}
                         className="p-2 text-gray-400 hover:text-gray-500"
                       >
                         <span className="sr-only">Search</span>
@@ -433,7 +434,7 @@ export default function Header() {
                           aria-hidden="true"
                           className="size-6"
                         />
-                      </a>
+                      </Link>
                     </div>
 
                     {/* Cart */}
