@@ -1,0 +1,30 @@
+.product-container {
+  transition: transform 0.3s ease-in-out;
+  position: relative;
+  overflow: hidden;
+}
+
+.product-order-slide {
+  position: absolute;
+  bottom: -100%;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(194, 232, 230, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  transition: bottom 0.5s ease-in-out;
+}
+
+.product-container:hover .product-order-slide {
+  bottom: 0;
+}
+
+.product-order-slide button {
+  transition: transform 0.2s ease-in-out;
+}
+
+.product-order-slide button:hover {
+  transform: scale(1.1);
+}
