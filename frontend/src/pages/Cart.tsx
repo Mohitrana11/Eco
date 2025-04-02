@@ -29,23 +29,48 @@ function Cart() {
     setValidCouponCode(couponCode.trim() !== "");
   }, [couponCode]);
 
+  const [quantity, setQuantity] = useState(1);
+
+  const increase = () => setQuantity(quantity + 1);
+  const decrease = () => {
+    if (quantity > 1) setQuantity(quantity - 1);
+  };
+
   return (
-    <div className="flex flex-col md:flex-row w-full h-full p-4 bg-gray-100">
-      <div className="flex-grow bg-white p-6 rounded-md shadow-md">
+    <div className="flex flex-col md:flex-row w-full h-full  p-4 bg-gray-100">
+      <div className="flex-grow bg-white px-6 py-2 rounded-md shadow-md h-[50vh] ">
         <h2 className="text-2xl font-semibold mb-4">Your Bag</h2>
         {cartItems.map((item) => (
           <div key={item.id} className="border-b py-4 flex justify-between">
-            <div>
-              <img src={item.imgs} alt="product Image" />
-              <p className="font-bold">{item.name}</p>
-              <p>
-                Gender: {item.gender}, Color: {item.color}
-              </p>
-              <p>Price: ₹{item.price.toFixed(2)}</p>
-              <div className="quantity-control">
-                <button className="decrease">-</button>
-                <span className="quantity-display">1</span>
-                <button className="increase">+</button>
+            <div className="flex flex-row">
+              <img
+                src={item.imgs}
+                alt="product Image"
+                className="w-[150px] h-[130px] "
+              />
+              <div>
+                <p className="font-bold">{item.name}</p>
+                <p>
+                  Gender: {item.gender}, Color: {item.color}
+                </p>
+                <p>Price: ₹{item.price.toFixed(2)}</p>
+                <div className="flex items-center gap-1 p-1 border border-gray-300 rounded-lg w-max bg-white shadow-md mt-5">
+                  <button
+                    onClick={decrease}
+                    className="w-5 h-5 flex items-center justify-center bg-gray-200 text-gray-700 rounded-full hover:bg-gray-300 active:scale-90 transition-all cursor-pointer"
+                  >
+                    −
+                  </button>
+                  <span className="text-lg font-semibold w-8 text-center">
+                    {quantity}
+                  </span>
+                  <button
+                    onClick={increase}
+                    className="w-5 h-5 flex items-center justify-center bg-blue-500 text-white rounded-full hover:bg-blue-600 active:scale-90 transition-all cursor-pointer"
+                  >
+                    +
+                  </button>
+                </div>
               </div>
             </div>
             <p className="text-xl font-bold">
@@ -57,7 +82,7 @@ function Cart() {
           Subtotal: ₹{subtotal.toFixed(2)}
         </p>
       </div>
-      <div className="w-full md:w-1/3 bg-white p-6 rounded-md shadow-md mt-4 md:mt-0 md:ml-4">
+      <div className="w-full md:w-1/3 bg-white p-6 rounded-md shadow-md mt-4 md:mt-0 md:ml-4 ">
         <h2 className="text-2xl font-semibold mb-4">Order Summary</h2>
         <p>Product Total: ₹{subtotal.toFixed(2)}</p>
         <p>Tax: ₹{tax}</p>
