@@ -157,7 +157,7 @@ export default function Header() {
   const [open, setOpen] = useState(false);
   const user = true;
   return (
-    <div className="bg-white fixed top-0 w-full ">
+    <div className="bg-white fixed top-0 w-full z-40 ">
       {/* Mobile menu */}
       <Dialog open={open} onClose={setOpen} className="relative z-40 lg:hidden">
         <DialogBackdrop

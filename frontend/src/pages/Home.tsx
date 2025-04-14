@@ -8,7 +8,7 @@ function Home() {
     <>
       <div>
         <div>Home Page</div>
-        <div className="w-full h-full md:mx-[4%]">
+        <div className="w-full h-full md:mx-[4%] pt-[70px]">
           <ProductCard3 />
           {/* <ProductCard1 /> */}
           {/* <ProductCard2 /> */}
