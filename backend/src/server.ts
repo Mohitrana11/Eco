@@ -25,6 +25,8 @@ app.use("/api/v1/user/", userRouter);
 import productRouter from "./router/product";
 app.use("/api/v1/product/", productRouter);
 
+app.use("/uploads", express.static("uploads"));
+
 import { errorMiddleware } from "./middlewares/error";
 app.use(errorMiddleware);
 

@@ -1,6 +1,13 @@
 import mongoose, { NumberExpression, Schema } from "mongoose";
 
-interface iProduct extends Document {}
+interface iProduct extends Document {
+  name: string;
+  photo: string;
+  price: Number;
+  stock: Number;
+  description: string;
+  category: string;
+}
 
 const productSchema = new mongoose.Schema(
   {
@@ -10,27 +17,28 @@ const productSchema = new mongoose.Schema(
     },
     photo: {
       type: String,
-      required: [true, "Please enter name"],
+      required: [true, "Please enter photo"],
     },
     price: {
       type: Number,
-      required: [true, "Please enter name"],
+      required: [true, "Please enter price"],
     },
     stock: {
       type: Number,
-      required: [true, "Please enter name"],
+      required: [true, "Please enter product stock"],
     },
-    discription: {
+    description: {
       type: String,
       required: [true, "Please enter discription"],
     },
     category: {
       type: String,
       required: [true, "Please engter product category"],
+      trim: true,
     },
   },
   { timestamps: true }
 );
 
-const Product = mongoose.model("productdb", productSchema);
+const Product = mongoose.model<iProduct>("productdb", productSchema);
 export default Product;

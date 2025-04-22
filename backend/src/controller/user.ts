@@ -10,15 +10,26 @@ const register = catchAsyncError(
     res: Response,
     next: NextFunction
   ) => {
-    const { name, email, dob, gender, photo, role, _id } = req.body;
+    const { name, email, dob, gender, photo } = req.body;
+    if (!name || !email || !dob || !gender || !photo) {
+      return next(new ErrorHandler("Please provide all details", 400));
+    }
+    // const isEmail = await User.find({ email });
+    // if (isEmail) {
+    //   next(
+    //     new ErrorHandler(
+    //       "This user email already exist so use different Email",
+    //       400
+    //     )
+    //   );
+    // }
+
     const user = await User.create({
       name,
       email,
-      dob,
+      dob: new Date(dob),
       gender,
       photo,
-      role,
-      _id,
     });
     res.status(201).json({
       success: true,
@@ -29,22 +40,16 @@ const register = catchAsyncError(
 
 const login = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
-    const { email, _id } = req.body;
+    const { email } = req.body;
 
-    if (!email || !_id) {
-      return res.status(400).json({
-        success: false,
-        message: "Please provide email and ID",
-      });
+    if (!email) {
+      return next(new ErrorHandler("Please provide you email", 400));
     }
 
-    const user = await User.findOne({ email, _id });
+    const user = await User.findOne({ email });
 
     if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found",
-      });
+      return next(new ErrorHandler("Please user not found", 400));
     }
 
     return res.status(200).json({
@@ -69,11 +74,11 @@ const logout = catchAsyncError(
 );
 
 const getAllUsers = catchAsyncError(async (req: Request, res: Response) => {
-  const users = await User.find();
+  const users = await User.find({});
 
   res.status(200).json({
     success: true,
-    count: users.length,
+    // count: users.length,
     users,
   });
 });

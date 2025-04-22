@@ -1,9 +1,35 @@
 export interface newUserRequestBody {
-  _id: string;
   name: string;
   email: string;
   photo: string;
   role: "admin" | "user";
   gender: ["male", "female"];
   dob: Date;
+}
+export interface newProductRequestBody {
+  name: string;
+  photo: string;
+  price: Number;
+  stock: Number;
+  description: string;
+  category: string;
+}
+
+export interface searchRequestQuery {
+  search?: string;
+  sort?: string;
+  category?: string;
+  price?: string;
+  page?: string;
+}
+
+export interface baseQueryType {
+  name?: {
+    $regex: string;
+    $options: string;
+  };
+  price?: {
+    $lte: number;
+  };
+  category?: string;
 }

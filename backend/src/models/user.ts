@@ -1,7 +1,6 @@
 import mongoose, { NumberExpression, Schema } from "mongoose";
-
+import validator from "validator";
 interface iUser extends Document {
-  _id: string;
   name: string;
   email: string;
   photo: string;
@@ -15,17 +14,13 @@ interface iUser extends Document {
 
 const userSchema = new mongoose.Schema(
   {
-    _id: {
-      type: String,
-      required: [true, "Please enter Id"],
-    },
     name: {
       type: String,
       required: [true, "Please enter name"],
     },
     photo: {
       type: String,
-      required: [true, "Please provide phot"],
+      required: [true, "Please provide photo"],
     },
     role: {
       type: String,
@@ -34,18 +29,18 @@ const userSchema = new mongoose.Schema(
     },
     gender: {
       type: String,
-      enum: ["mail", "female"],
+      enum: ["male", "female"],
       required: [true, "Please provide your gender"],
     },
     email: {
       type: String,
       unique: [true, "Email already exist"],
       required: [true, "Please provide your email"],
-      //   validate:[validetor.isEmail(),'wrong Email']
+      validate: [validator.isEmail, "wrong Email"],
     },
     dob: {
       type: Date,
-      required: [true, "Please enter you Date of Birth"],
+      required: [true, "Please provide you Date of Birth"],
     },
   },
   { timestamps: true }
