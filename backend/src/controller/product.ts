@@ -7,6 +7,8 @@ import {
   newProductRequestBody,
   searchRequestQuery,
 } from "../types/type";
+import { myCache } from "../server";
+import { invalidateCache } from "../utils/feature";
 
 const createProduct = catchAsyncError(
   async (
@@ -30,6 +32,7 @@ const createProduct = catchAsyncError(
       description,
       category: category.toLowerCase(),
     });
+    await invalidateCache({ product: true }); // Node-cache
     return res.status(201).json({
       success: true,
       message: "New product is created",
@@ -38,9 +41,16 @@ const createProduct = catchAsyncError(
   }
 );
 
+// Revalidate on New update and delete : node-cache:
 const getLatestProduct = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
-    const products = await Product.find({}).sort({ createdAt: -1 }).limit(5);
+    let products;
+    if (myCache.has("latest-product")) {
+      products = JSON.parse(myCache.get("latest-product") as string);
+    } else {
+      products = await Product.find({}).sort({ createdAt: -1 }).limit(5);
+      myCache.set("latest-product", JSON.stringify(products)); //
+    }
 
     return res.status(201).json({
       success: true,
@@ -51,7 +61,13 @@ const getLatestProduct = catchAsyncError(
 
 const getCategoryProduct = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
-    const categories = await Product.distinct("category");
+    let categories;
+    if (myCache.has("categories")) {
+      categories = JSON.parse(myCache.get("categories") as string);
+    } else {
+      categories = await Product.distinct("category");
+      myCache.set("category", JSON.stringify(categories));
+    }
 
     return res.status(201).json({
       success: true,
@@ -62,7 +78,13 @@ const getCategoryProduct = catchAsyncError(
 
 const getAdminProduct = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
-    const categories = await Product.distinct("category");
+    let categories;
+    if (myCache.has("all-products")) {
+      categories = JSON.parse(myCache.get("all-products") as string);
+    } else {
+      categories = await Product.distinct("category");
+      myCache.set("all-products", JSON.stringify(categories));
+    }
 
     return res.status(201).json({
       success: true,
@@ -74,10 +96,18 @@ const getAdminProduct = catchAsyncError(
 const getSingleProduct = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     const id = req.params.id;
-    const product = await Product.findById(id);
-    if (!product) {
-      next(new ErrorHandler("Product not found", 404));
+    let product;
+
+    if (myCache.has(`product-${id}`)) {
+      product = JSON.parse(myCache.get(`product-${id}`) as string);
+    } else {
+      product = await Product.findById(id);
+      if (!product) {
+        next(new ErrorHandler("Product not found", 404));
+      }
+      myCache.set(`product-${id}`, JSON.stringify(product));
     }
+
     return res.status(201).json({
       success: true,
       product,
@@ -106,7 +136,7 @@ const updateProduct = catchAsyncError(
     if (description) product.description = description;
 
     await product.save();
-
+    await invalidateCache({ product: true });
     return res.status(200).json({
       success: true,
       message: "Product Updated Successfully",
@@ -122,6 +152,7 @@ const deleteProduct = catchAsyncError(
       next(new ErrorHandler("Product not found", 404));
     }
     await Product.deleteOne();
+    await invalidateCache({ product: true });
     return res.status(200).json({
       success: true,
       message: "Product deleted Successfully",

@@ -9,6 +9,9 @@ import bodyParser from "body-parser";
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: false }));
 
+import NodeCache from "node-cache";
+export const myCache = new NodeCache();
+
 import { dbConnect } from "./utils/feature";
 dbConnect();
 
