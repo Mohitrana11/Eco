@@ -5,9 +5,12 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+import morgan from "morgan";
+
 import bodyParser from "body-parser";
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(morgan("dev"));
 
 import NodeCache from "node-cache";
 export const myCache = new NodeCache();
@@ -27,6 +30,10 @@ app.use("/api/v1/user/", userRouter);
 // Product Routers:
 import productRouter from "./router/product";
 app.use("/api/v1/product/", productRouter);
+
+// Order Router:
+import orderRouter from "./router/order";
+app.use("/api/v1/order/", orderRouter);
 
 app.use("/uploads", express.static("uploads"));
 
