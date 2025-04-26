@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { catchAsyncError } from "../middlewares/error";
-import { Order } from "../models/order";
+import Order from "../models/order";
 import { NewOrderRequestBody } from "../types/type";
 import ErrorHandler from "../utils/ErrorHandler";
 import { invalidateCache, reduceStock } from "../utils/feature";
@@ -99,8 +99,8 @@ const newOrder = catchAsyncError(
       product: true,
       order: true,
       admin: true,
-      // userId: user,
-      // productId: order.orderItems.map((i) => String(i.productId)),
+      userId: user,
+      productId: order.orderItems.map((i) => String(i.productId)),
     });
 
     return res.status(201).json({
@@ -130,10 +130,13 @@ const processOrder = catchAsyncError(
     }
 
     await order.save();
+
     await invalidateCache({
       product: false,
       order: true,
       admin: true,
+      userId: order.user,
+      orderId: String(order._id),
     });
 
     return res.status(200).json({

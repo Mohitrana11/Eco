@@ -17,6 +17,9 @@ const errorMiddleware = (
     message = err.message;
   }
 
+  if (err.message == "CastError") {
+    err.message = "Invalid ID";
+  }
   res.status(statusCode).json({
     success: false,
     message,

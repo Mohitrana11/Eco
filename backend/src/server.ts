@@ -15,6 +15,10 @@ app.use(morgan("dev"));
 import NodeCache from "node-cache";
 export const myCache = new NodeCache();
 
+import Stripe from "stripe";
+const stripeKey = process.env.STRIPE_KEY || "";
+export const stripe = new Stripe(stripeKey);
+
 import { dbConnect } from "./utils/feature";
 dbConnect();
 
@@ -34,6 +38,10 @@ app.use("/api/v1/product/", productRouter);
 // Order Router:
 import orderRouter from "./router/order";
 app.use("/api/v1/order/", orderRouter);
+
+// Order Router:
+import couponRouter from "./router/order";
+app.use("/api/v1/order/", couponRouter);
 
 app.use("/uploads", express.static("uploads"));
 
