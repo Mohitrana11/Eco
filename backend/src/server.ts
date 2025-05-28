@@ -5,22 +5,33 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-import morgan from "morgan";
+import cors from 'cors';
+app.use(cors())
 
 import bodyParser from "body-parser";
+import cookieParse from "cookie-parser";
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(cookieParse());
+
+
+
+//  Database Connection
+import { dbConnect } from "./utils/feature";
+dbConnect();
+
+// know Type API :- Morgan
+import morgan from "morgan";
 app.use(morgan("dev"));
 
+// Cache Data:
 import NodeCache from "node-cache";
 export const myCache = new NodeCache();
 
+// Payment Method:
 import Stripe from "stripe";
 const stripeKey = process.env.STRIPE_KEY || "";
 export const stripe = new Stripe(stripeKey);
-
-import { dbConnect } from "./utils/feature";
-dbConnect();
 
 app.get("/", (req: Request, res: Response) => {
   res.send("send data to me");
@@ -38,10 +49,6 @@ app.use("/api/v1/product/", productRouter);
 // Order Router:
 import orderRouter from "./router/order";
 app.use("/api/v1/order/", orderRouter);
-
-// Order Router:
-import couponRouter from "./router/order";
-app.use("/api/v1/order/", couponRouter);
 
 app.use("/uploads", express.static("uploads"));
 

@@ -412,7 +412,7 @@ export default function Header() {
                   {navigation.pages.map((page) => (
                     <Link
                       key={page.name}
-                      href={page.href}
+                      to={page.href}
                       className="flex items-center text-sm font-medium text-gray-700 hover:text-gray-800"
                     >
                       {page.name}
@@ -452,7 +452,7 @@ export default function Header() {
                     </div>
 
                     {/* Avatar */}
-                    <div className="ml-4 flow-root lg:ml-10">
+                    <Link to={"/login"} className="ml-4 flow-root lg:ml-10">
                       <div className="flex -space-x-1 cursor-pointer">
                         <img
                           alt=""
@@ -460,7 +460,7 @@ export default function Header() {
                           className="inline-block size-7 rounded-full ring-2 ring-white hover:scale-105"
                         />
                       </div>
-                    </div>
+                    </Link>
                   </div>
                 </>
               ) : (
@@ -510,7 +510,7 @@ export default function Header() {
                   </div>
 
                   {/* Avatar */}
-                  <div className="ml-4 flow-root lg:ml-10">
+                  <Link to={"/login"} className="ml-4 flow-root lg:ml-10">
                     <div className="flex -space-x-1 cursor-pointer">
                       <img
                         alt=""
@@ -518,7 +518,7 @@ export default function Header() {
                         className="inline-block size-7 rounded-full ring-2 ring-white hover:scale-105"
                       />
                     </div>
-                  </div>
+                  </Link>
                 </div>
               )}
             </div>

@@ -3,6 +3,7 @@ import User from "../models/user";
 import { newUserRequestBody } from "../types/type";
 import { catchAsyncError } from "../middlewares/error";
 import ErrorHandler from "../utils/ErrorHandler";
+import jwt from "jsonwebtoken";
 
 const register = catchAsyncError(
   async (
@@ -10,59 +11,87 @@ const register = catchAsyncError(
     res: Response,
     next: NextFunction
   ) => {
-    const { name, email, dob, gender, photo } = req.body;
-    if (!name || !email || !dob || !gender || !photo) {
+    const { name, email, password, dob, gender, photo } = req.body;
+
+    if (!name || !email || !dob || !password || !gender || !photo) {
       return next(new ErrorHandler("Please provide all details", 400));
     }
-    // const isEmail = await User.find({ email });
-    // if (isEmail) {
-    //   next(
-    //     new ErrorHandler(
-    //       "This user email already exist so use different Email",
-    //       400
-    //     )
-    //   );
-    // }
+
+    const isEmail = await User.findOne({ email });
+
+    if (isEmail) {
+      return next(
+        new ErrorHandler(
+          "This email already exists. Please use a different email.",
+          400
+        )
+      );
+    }
 
     const user = await User.create({
       name,
       email,
+      password,
       dob: new Date(dob),
       gender,
       photo,
     });
-    res.status(201).json({
-      success: true,
-      message: `Welcome,${user.name}`,
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET as string, {
+      expiresIn: 2 * 1000 * 60 * 24,
     });
+
+    res
+      .status(201)
+      .cookie("token", token)
+      .json({
+        success: true,
+        message: `Welcome, ${user.name}. Your registration was successful.`,
+        userId: user._id,
+      });
   }
 );
 
 const login = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
-    const { email } = req.body;
+    const { email, password } = req.body;
 
-    if (!email) {
-      return next(new ErrorHandler("Please provide you email", 400));
+    if (!email || !password) {
+      return next(
+        new ErrorHandler("Please provide your email and password", 400)
+      );
     }
 
     const user = await User.findOne({ email });
 
     if (!user) {
-      return next(new ErrorHandler("Please user not found", 400));
+      return next(new ErrorHandler("User  not found", 404));
     }
 
-    return res.status(200).json({
-      success: true,
-      message: `Welcome back, ${user.name}`,
-      user,
+    const isPasswordValid = await user.compareHash(password);
+
+    if (!isPasswordValid) {
+      return next(new ErrorHandler("Wrong password", 401));
+    }
+
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET as string, {
+      expiresIn: 2 * 1000 * 60 * 24,
     });
+
+    return res
+      .status(200)
+      .cookie("token", token)
+      .json({
+        success: true,
+        message: `Welcome back, ${user.name}`,
+        userId: user._id,
+        token,
+      });
   }
 );
 
 const logout = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
-    res.cookie("token", {
+    res.cookie("token", "", {
       httpOnly: true,
       expires: new Date(Date.now() - 1),
     });
@@ -74,19 +103,19 @@ const logout = catchAsyncError(
 );
 
 const getAllUsers = catchAsyncError(async (req: Request, res: Response) => {
-  const users = await User.find({});
+  const user = await User.find({});
 
   res.status(200).json({
     success: true,
-    // count: users.length,
-    users,
+    count: user.length,
+    user,
   });
 });
 
-const getUsers = catchAsyncError(
+const getSingleUser = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     const id = req.params.id;
-    const user = await User.findById(id);
+    const user = await User.findById(id).select("-password");
     if (!user) {
       return next(new ErrorHandler("User not found", 404));
     }
@@ -97,4 +126,4 @@ const getUsers = catchAsyncError(
   }
 );
 
-export { register, login, getAllUsers, logout, getUsers };
+export { register, login, getAllUsers, logout, getSingleUser };

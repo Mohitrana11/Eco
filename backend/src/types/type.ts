@@ -1,11 +1,15 @@
 export interface newUserRequestBody {
   name: string;
   email: string;
+  password: string;
+  user: string;
   photo: string;
   role: "admin" | "user";
   gender: ["male", "female"];
   dob: Date;
+  compareHash(password: string): Promise<boolean>;
 }
+
 export interface newProductRequestBody {
   name: string;
   photo: string;

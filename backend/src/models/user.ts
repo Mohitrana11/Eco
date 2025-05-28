@@ -1,18 +1,22 @@
-import mongoose, { NumberExpression, Schema } from "mongoose";
+import mongoose, { Document, Schema } from "mongoose";
 import validator from "validator";
-interface iUser extends Document {
+import bcrypt from "bcryptjs";
+
+interface IUser extends Document {
   name: string;
   email: string;
+  password: string;
   photo: string;
-  role: ["admin", "user"];
-  gender: ["male", "female"];
+  role: "admin" | "user";
+  gender: "male" | "female";
   dob: Date;
-  createdAt: string;
-  updateAt: string;
+  createdAt: Date;
+  updatedAt: Date;
   age: number;
+  compareHash(password: string): Promise<boolean>;
 }
 
-const userSchema = new mongoose.Schema(
+const userSchema = new mongoose.Schema<IUser>(
   {
     name: {
       type: String,
@@ -21,6 +25,7 @@ const userSchema = new mongoose.Schema(
     photo: {
       type: String,
       required: [true, "Please provide photo"],
+      // validate: [validator.isURL, "Invalid URL"],
     },
     role: {
       type: String,
@@ -34,13 +39,18 @@ const userSchema = new mongoose.Schema(
     },
     email: {
       type: String,
-      unique: [true, "Email already exist"],
+      unique: [true, "Email already exists"],
       required: [true, "Please provide your email"],
-      validate: [validator.isEmail, "wrong Email"],
+      validate: [validator.isEmail, "Invalid Email"],
+    },
+    password: {
+      type: String,
+      required: [true, "Please provide a password"],
+      minlength: [6, "Password must be at least 6 characters long"],
     },
     dob: {
       type: Date,
-      required: [true, "Please provide you Date of Birth"],
+      required: [true, "Please provide your Date of Birth"],
     },
   },
   { timestamps: true }
@@ -61,5 +71,19 @@ userSchema.virtual("age").get(function () {
   return age;
 });
 
-const User = mongoose.model<iUser>("userdb", userSchema);
+userSchema.pre<IUser>("save", async function (next) {
+  if (!this.isModified("password")) {
+    return next();
+  }
+  this.password = await bcrypt.hash(this.password, 10);
+  next();
+});
+
+userSchema.methods.compareHash = async function (
+  password: string
+): Promise<boolean> {
+  return await bcrypt.compare(password, this.password);
+};
+
+const User = mongoose.model<IUser>("User ", userSchema);
 export default User;

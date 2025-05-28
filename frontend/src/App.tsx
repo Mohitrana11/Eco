@@ -10,7 +10,7 @@ const Home = lazy(() => import("./pages/Home"));
 const Search = lazy(() => import("./pages/Search"));
 const Cart = lazy(() => import("./pages/Cart"));
 const OrderDetails = lazy(() => import("./pages/OrderDetails"));
-
+import { Toaster } from "react-hot-toast";
 function App() {
   return (
     <div>
@@ -31,6 +31,7 @@ function App() {
           </Routes>
         </Suspense>
       </BrowserRouter>
+      <Toaster position="bottom-right" />
     </div>
   );
 }

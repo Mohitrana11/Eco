@@ -1,5 +1,8 @@
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import React, { useState } from "react";
+import toast from "react-hot-toast";
 import { FaGoogle } from "react-icons/fa";
+import { auth } from "../firebase";
 
 function Login() {
   const [details, setDetails] = useState({ username: "", password: "" });
@@ -14,6 +17,16 @@ function Login() {
     console.log("Login details submitted: ", details);
   };
 
+  const loginHandler = async () => {
+    try {
+      const provider = new GoogleAuthProvider();
+      const { user } = await signInWithPopup(auth, provider);
+      console.log(user);
+    } catch (error) {
+      toast.error("Sugb in Fail" + error);
+    }
+  };
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4">
       <div className="bg-white shadow-lg rounded-lg p-8 w-full max-w-md">
@@ -23,9 +36,7 @@ function Login() {
             <label
               className="block text-sm font-medium text-gray-700"
               htmlFor="username"
-            >
-              Username
-            </label>
+            ></label>
             <input
               type="text"
               name="username"
@@ -62,7 +73,10 @@ function Login() {
         </form>
         <div className="mx-auto mt-6 text-center">
           <p className="text-sm text-gray-600">Already signed in once?</p>
-          <button className="flex items-center cursor-pointer px-2 justify-center mt-2 bg-red-500 text-white font-semibold py-2 rounded-md hover:bg-red-600 transition duration-200">
+          <button
+            onClick={loginHandler}
+            className="flex items-center cursor-pointer px-2 justify-center mt-2 bg-red-500 text-white font-semibold py-2 rounded-md hover:bg-red-600 transition duration-200"
+          >
             <FaGoogle className="mr-2" />
             Sign in with Google
           </button>
